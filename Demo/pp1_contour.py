@@ -44,6 +44,7 @@ class DocumentScannerBasedFindContours:
       [maxWidth - 1, maxHeight - 1],
       [0, maxHeight - 1]], dtype = "float32")
     M = cv.getPerspectiveTransform(rect, dst)
+    print(M)
     warped = cv.warpPerspective(img, M, (int(maxWidth), int(maxHeight)))
 
     # warped = cv.warpPerspective(img, M, (int(800), int(1000)))
@@ -100,10 +101,23 @@ class DocumentScannerBasedFindContours:
     img_close = self.handle_edge()
     cnts,_ = cv.findContours(img_close.copy(), cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
     # cnts = imutils.grab_contours(cnts)
-    cnts = sorted(cnts, key = cv.contourArea, reverse = True)[:5]
+    cnts = sorted(cnts, key = cv.contourArea, reverse = True)[:6]
+    # cnts = sorted(cnts, key = cv.contourArea, reverse = True)
     self.screenCnt = None
     min_area = self.img_resize.shape[0]*self.img_resize.shape[1] // 5
     img_cop_ = self.img_resize.copy()
+    # img_cop_2 = self.img_resize.copy()
+    # cv.drawContours(img_cop_2, cnts, -1, (0, 255, 0), 2)
+    # k = 0
+    # for c in cnts:
+    #   clr2 = [random.randint(0, 256) for i in range(3)]
+    #   if k==0 or k==1:
+    #     clr2 = (0, 255, 0)
+    #   k+=1
+    #   cv.drawContours(img_cop_2, [c], -1, clr2, 2)
+    #   print(len(c))
+
+
     for c in cnts:
       perimeter = cv.arcLength(c, True)
       epsilon = perimeter*(self.t/1000)
@@ -121,7 +135,8 @@ class DocumentScannerBasedFindContours:
         self.screenCnt = approx
         self.screenCnt = (self.screenCnt*self.ratio).astype("int32")
         break
-
+    # self.list_img.append(img_cop_2)
+    # self.lst_title.append(str(len(cnts)))
     self.list_img.append(img_cop_)
     self.lst_title.append("Các điểm sau khi lược bỏ theo epsilon")
 
